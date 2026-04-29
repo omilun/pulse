@@ -13,6 +13,8 @@ spec:
       labels:
         app: pulse-backend
     spec:
+      imagePullSecrets:
+        - name: ghcr-pull-secret
       containers:
         - name: api
           image: ghcr.io/omilun/pulse-backend:latest   # updated by GitHub Actions
