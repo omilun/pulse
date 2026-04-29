@@ -9,7 +9,7 @@ spec:
     - name: main-gateway
       namespace: networking
   hostnames:
-    - "pulse.talos-on-macos.com"
+    - "pulse.talos-tart-ha.talos-on-macos.com"
   rules:
     - backendRefs:
         - name: pulse-frontend
@@ -25,7 +25,7 @@ spec:
     - name: main-gateway
       namespace: networking
   hostnames:
-    - "api.pulse.talos-on-macos.com"
+    - "api.pulse.talos-tart-ha.talos-on-macos.com"
   rules:
     - backendRefs:
         - name: pulse-backend

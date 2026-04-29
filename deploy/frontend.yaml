@@ -14,15 +14,15 @@ spec:
         app: pulse-frontend
     spec:
       imagePullSecrets:
-        - name: ghcr-pull-secret
+        - name: harbor-registry-secret
       containers:
         - name: frontend
-          image: ghcr.io/omilun/pulse-frontend:latest  # updated by GitHub Actions
+          image: registry.talos-tart-ha.talos-on-macos.com/pulse/frontend:latest  # built by Argo Workflows + Kaniko, pushed to Zot registry
           ports:
             - containerPort: 3000
           env:
             - name: NEXT_PUBLIC_API_URL
-              value: "https://api.pulse.talos-on-macos.com/api"
+              value: "https://api.pulse.talos-tart-ha.talos-on-macos.com/api"
           resources:
             requests:
               cpu: 50m

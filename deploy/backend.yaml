@@ -14,10 +14,10 @@ spec:
         app: pulse-backend
     spec:
       imagePullSecrets:
-        - name: ghcr-pull-secret
+        - name: harbor-registry-secret
       containers:
         - name: api
-          image: ghcr.io/omilun/pulse-backend:latest   # updated by GitHub Actions
+          image: registry.talos-tart-ha.talos-on-macos.com/pulse/backend:latest   # built by Argo Workflows + Kaniko, pushed to Zot registry
           ports:
             - containerPort: 8080
           env:
