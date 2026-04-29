@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pulse-frontend
+  namespace: pulse
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pulse-frontend
+  template:
+    metadata:
+      labels:
+        app: pulse-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: ghcr.io/omilun/pulse-frontend:latest  # updated by GitHub Actions
+          ports:
+            - containerPort: 3000
+          env:
+            - name: NEXT_PUBLIC_API_URL
+              value: "https://api.pulse.talos-on-macos.com/api"
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pulse-frontend
+  namespace: pulse
+spec:
+  selector:
+    app: pulse-frontend
+  ports:
+    - port: 3000

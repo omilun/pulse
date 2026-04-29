@@ -1,0 +1,32 @@
+# HTTPRoutes — attach to the shared Cilium Gateway in the infra repo
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: pulse-frontend
+  namespace: pulse
+spec:
+  parentRefs:
+    - name: main-gateway
+      namespace: networking
+  hostnames:
+    - "pulse.talos-on-macos.com"
+  rules:
+    - backendRefs:
+        - name: pulse-frontend
+          port: 3000
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: pulse-api
+  namespace: pulse
+spec:
+  parentRefs:
+    - name: main-gateway
+      namespace: networking
+  hostnames:
+    - "api.pulse.talos-on-macos.com"
+  rules:
+    - backendRefs:
+        - name: pulse-backend
+          port: 8080

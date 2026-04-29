@@ -1,0 +1,12 @@
+# Go
+backend/vendor/
+*.test
+
+# Next.js
+frontend/.next/
+frontend/node_modules/
+frontend/out/
+
+# Misc
+.env
+.env.local

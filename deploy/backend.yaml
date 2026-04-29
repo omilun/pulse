@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pulse-backend
+  namespace: pulse
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pulse-backend
+  template:
+    metadata:
+      labels:
+        app: pulse-backend
+    spec:
+      containers:
+        - name: api
+          image: ghcr.io/omilun/pulse-backend:latest   # updated by GitHub Actions
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: pulse-db-app   # created by CloudNativePG operator
+                  key: uri
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pulse-backend
+  namespace: pulse
+spec:
+  selector:
+    app: pulse-backend
+  ports:
+    - port: 8080

@@ -1,0 +1,31 @@
+# CloudNativePG Cluster — pulse database
+# Managed by the cnpg operator (installed by Flux in cnpg-system).
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: pulse-db
+  namespace: pulse
+spec:
+  instances: 1        # single instance — fine for homelab
+  imageName: ghcr.io/cloudnative-pg/postgresql:16
+  storage:
+    size: 2Gi
+  bootstrap:
+    initdb:
+      database: pulse
+      owner: pulse
+      secret:
+        name: pulse-db-credentials
+---
+# Credentials secret — in production use external-secrets or Sealed Secrets.
+# For this demo, apply manually once: kubectl create secret generic pulse-db-credentials \
+#   -n pulse --from-literal=username=pulse --from-literal=password=changeme
+# Or let ArgoCD manage it via a SealedSecret.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: pulse-db-credentials
+  namespace: pulse
+stringData:
+  username: pulse
+  password: changeme   # change before committing to a private repo
