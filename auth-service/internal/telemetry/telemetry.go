@@ -12,6 +12,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"go.opentelemetry.io/otel"
@@ -54,7 +55,7 @@ func Init(ctx context.Context) (shutdown func(context.Context) error, err error)
 	}
 
 	conn, err := grpc.NewClient(
-		endpoint,
+		strings.TrimPrefix(strings.TrimPrefix(endpoint, "http://"), "https://"),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
