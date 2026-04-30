@@ -21,8 +21,8 @@ spec:
           ports:
             - containerPort: 3000
           env:
-            - name: NEXT_PUBLIC_API_URL
-              value: "https://api.pulse.talos-tart-ha.talos-on-macos.com/api"
+            - name: BACKEND_URL
+              value: "http://pulse-backend:8080"
           resources:
             requests:
               cpu: 50m

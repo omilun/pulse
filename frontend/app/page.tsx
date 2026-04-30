@@ -8,7 +8,7 @@ type Entry = {
   created_at: string;
 };
 
-const API = process.env.NEXT_PUBLIC_API_URL ?? "/api";
+const API = "/api";
 const CATEGORIES = ["general", "idea", "note", "task", "log"];
 
 export default function Home() {
