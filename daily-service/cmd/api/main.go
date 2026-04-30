@@ -6,10 +6,13 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/omilun/pulse/daily-service/internal/handler"
 	"github.com/omilun/pulse/daily-service/internal/store"
+	"github.com/omilun/pulse/daily-service/internal/telemetry"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 func main() {
@@ -18,6 +21,19 @@ func main() {
 	if dsn == "" || jwtSecret == "" {
 		log.Fatal("DATABASE_URL and JWT_SECRET are required")
 	}
+
+	ctx := context.Background()
+	shutdown, err := telemetry.Init(ctx)
+	if err != nil {
+		log.Fatalf("init telemetry: %v", err)
+	}
+	defer func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err := shutdown(ctx); err != nil {
+			log.Printf("telemetry shutdown: %v", err)
+		}
+	}()
 
 	db, err := store.New(dsn)
 	if err != nil {
@@ -56,7 +72,11 @@ func main() {
 		port = "8083"
 	}
 	log.Printf("daily-service listening on :%s", port)
-	log.Fatal(http.ListenAndServe(":"+port, authMiddleware(jwtSecret, corsMiddleware(mux))))
+
+	otelHandler := otelhttp.NewHandler(authMiddleware(jwtSecret, corsMiddleware(mux)), "daily-service",
+		otelhttp.WithMessageEvents(otelhttp.ReadEvents, otelhttp.WriteEvents),
+	)
+	log.Fatal(http.ListenAndServe(":"+port, otelHandler))
 }
 
 func authMiddleware(secret string, next http.Handler) http.Handler {

@@ -1,13 +1,17 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/omilun/pulse/auth-service/internal/handler"
 	"github.com/omilun/pulse/auth-service/internal/middleware"
 	"github.com/omilun/pulse/auth-service/internal/store"
+	"github.com/omilun/pulse/auth-service/internal/telemetry"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 func main() {
@@ -19,6 +23,19 @@ func main() {
 	if jwtSecret == "" {
 		log.Fatal("JWT_SECRET is required")
 	}
+
+	ctx := context.Background()
+	shutdown, err := telemetry.Init(ctx)
+	if err != nil {
+		log.Fatalf("init telemetry: %v", err)
+	}
+	defer func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err := shutdown(ctx); err != nil {
+			log.Printf("telemetry shutdown: %v", err)
+		}
+	}()
 
 	db, err := store.New(dsn)
 	if err != nil {
@@ -42,7 +59,12 @@ func main() {
 		port = "8081"
 	}
 	log.Printf("auth-service listening on :%s", port)
-	log.Fatal(http.ListenAndServe(":"+port, corsMiddleware(mux)))
+
+	// otelhttp wraps the entire mux to create spans for every request
+	handler := otelhttp.NewHandler(corsMiddleware(mux), "auth-service",
+		otelhttp.WithMessageEvents(otelhttp.ReadEvents, otelhttp.WriteEvents),
+	)
+	log.Fatal(http.ListenAndServe(":"+port, handler))
 }
 
 func corsMiddleware(next http.Handler) http.Handler {

@@ -6,18 +6,26 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/XSAM/otelsql"
 	_ "github.com/lib/pq"
 	"github.com/omilun/pulse/daily-service/internal/model"
+	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
 )
 
 type Store struct{ db *sql.DB }
 
 func New(dsn string) (*Store, error) {
-	db, err := sql.Open("postgres", dsn)
+	db, err := otelsql.Open("postgres", dsn,
+		otelsql.WithAttributes(semconv.DBSystemPostgreSQL),
+		otelsql.WithSpanOptions(otelsql.SpanOptions{Ping: true}),
+	)
 	if err != nil {
 		return nil, err
 	}
 	if err := db.Ping(); err != nil {
+		return nil, err
+	}
+	if _, err := otelsql.RegisterDBStatsMetrics(db, otelsql.WithAttributes(semconv.DBSystemPostgreSQL)); err != nil {
 		return nil, err
 	}
 	return &Store{db: db}, nil
