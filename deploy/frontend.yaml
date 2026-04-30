@@ -21,8 +21,12 @@ spec:
           ports:
             - containerPort: 3000
           env:
-            - name: BACKEND_URL
-              value: "http://pulse-backend:8080"
+            - name: AUTH_URL
+              value: "http://pulse-auth:8081"
+            - name: LONGTERM_URL
+              value: "http://pulse-longterm:8082"
+            - name: DAILY_URL
+              value: "http://pulse-daily:8083"
           resources:
             requests:
               cpu: 50m
