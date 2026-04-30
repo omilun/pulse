@@ -1,65 +1,9 @@
-# HTTPRoutes — attach to the shared Cilium Gateway in the infra repo
-# All routes use the same hostname; path-based routing dispatches to each service.
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: pulse-auth
-  namespace: pulse
-spec:
-  parentRefs:
-    - name: main-gateway
-      namespace: networking
-  hostnames:
-    - "pulse.talos-tart-ha.talos-on-macos.com"
-  rules:
-    - matches:
-        - path:
-            type: PathPrefix
-            value: /auth/
-      backendRefs:
-        - name: pulse-auth
-          port: 8081
----
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: pulse-longterm
-  namespace: pulse
-spec:
-  parentRefs:
-    - name: main-gateway
-      namespace: networking
-  hostnames:
-    - "pulse.talos-tart-ha.talos-on-macos.com"
-  rules:
-    - matches:
-        - path:
-            type: PathPrefix
-            value: /api/lt/
-      backendRefs:
-        - name: pulse-longterm
-          port: 8082
----
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: pulse-daily
-  namespace: pulse
-spec:
-  parentRefs:
-    - name: main-gateway
-      namespace: networking
-  hostnames:
-    - "pulse.talos-tart-ha.talos-on-macos.com"
-  rules:
-    - matches:
-        - path:
-            type: PathPrefix
-            value: /api/daily/
-      backendRefs:
-        - name: pulse-daily
-          port: 8083
----
+# Single HTTPRoute — all traffic goes to the frontend.
+# The Next.js app handles API proxying via server-side route handlers:
+#   /auth/*       → app/auth/[route].ts  → pulse-auth:8081
+#   /api/lt/*     → app/api/lt/[...path]/route.ts  → pulse-longterm:8082
+#   /api/daily/*  → app/api/daily/[...path]/route.ts → pulse-daily:8083
+#   /*            → Next.js pages
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:

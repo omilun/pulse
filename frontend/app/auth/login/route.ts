@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const BACKEND = process.env.BACKEND_URL ?? 'http://pulse-backend:8080';
+const AUTH_URL = process.env.AUTH_URL ?? 'http://localhost:8081';
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
-  const res = await fetch(`${BACKEND}/auth/login`, {
+  const res = await fetch(`${AUTH_URL}/auth/login`, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body,
