@@ -1,0 +1,66 @@
+version: "3.9"
+services:
+  auth-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: auth
+      POSTGRES_USER: auth
+      POSTGRES_PASSWORD: dev
+    ports: ["5433:5432"]
+    volumes: [auth-db-data:/var/lib/postgresql/data]
+
+  longterm-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: longterm
+      POSTGRES_USER: longterm
+      POSTGRES_PASSWORD: dev
+    ports: ["5434:5432"]
+    volumes: [longterm-db-data:/var/lib/postgresql/data]
+
+  daily-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: daily
+      POSTGRES_USER: daily
+      POSTGRES_PASSWORD: dev
+    ports: ["5435:5432"]
+    volumes: [daily-db-data:/var/lib/postgresql/data]
+
+  auth-service:
+    build: ./auth-service
+    ports: ["8081:8081"]
+    environment:
+      DATABASE_URL: "postgres://auth:dev@auth-db:5432/auth?sslmode=disable"
+      JWT_SECRET: "dev-jwt-secret-change-in-prod"
+    depends_on: [auth-db]
+
+  longterm-service:
+    build: ./longterm-service
+    ports: ["8082:8082"]
+    environment:
+      DATABASE_URL: "postgres://longterm:dev@longterm-db:5432/longterm?sslmode=disable"
+      JWT_SECRET: "dev-jwt-secret-change-in-prod"
+    depends_on: [longterm-db]
+
+  daily-service:
+    build: ./daily-service
+    ports: ["8083:8083"]
+    environment:
+      DATABASE_URL: "postgres://daily:dev@daily-db:5432/daily?sslmode=disable"
+      JWT_SECRET: "dev-jwt-secret-change-in-prod"
+    depends_on: [daily-db]
+
+  frontend:
+    build: ./frontend
+    ports: ["3000:3000"]
+    environment:
+      AUTH_URL: "http://auth-service:8081"
+      LONGTERM_URL: "http://longterm-service:8082"
+      DAILY_URL: "http://daily-service:8083"
+    depends_on: [auth-service, longterm-service, daily-service]
+
+volumes:
+  auth-db-data:
+  longterm-db-data:
+  daily-db-data:

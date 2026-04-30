@@ -1,12 +1,12 @@
-# Go
-backend/vendor/
+# Go binaries
+*/bin/
 *.test
+*.out
 
-# Next.js
-frontend/.next/
-frontend/node_modules/
-frontend/out/
-
-# Misc
+# Go environment
 .env
 .env.local
+
+# OS
+.DS_Store
+Thumbs.db
