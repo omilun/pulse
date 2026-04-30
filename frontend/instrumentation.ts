@@ -14,7 +14,7 @@ export async function register() {
     const { OTLPTraceExporter } = await import(
       "@opentelemetry/exporter-trace-otlp-http"
     );
-    const { Resource } = await import("@opentelemetry/resources");
+    const { resourceFromAttributes } = await import("@opentelemetry/resources");
     const { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } = await import(
       "@opentelemetry/semantic-conventions"
     );
@@ -23,7 +23,7 @@ export async function register() {
     if (!endpoint) return; // OTel disabled when endpoint not set
 
     const sdk = new NodeSDK({
-      resource: new Resource({
+      resource: resourceFromAttributes({
         [ATTR_SERVICE_NAME]:
           process.env.OTEL_SERVICE_NAME ?? "pulse-frontend",
         [ATTR_SERVICE_VERSION]: process.env.npm_package_version ?? "unknown",
