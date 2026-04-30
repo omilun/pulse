@@ -30,7 +30,7 @@ All services are written in **Go** (stdlib only, no frameworks) with **PostgreSQ
 
 ### Prerequisites
 - Docker + Docker Compose
-- Go 1.23+
+- Go 1.25+
 - Node.js 20+
 
 ### With Docker Compose (recommended)
@@ -107,6 +107,8 @@ npm run dev
 | `DATABASE_URL` | PostgreSQL connection URI |
 | `JWT_SECRET` | Shared JWT signing secret (same across all services) |
 | `PORT` | Port to listen on (default: 8081/8082/8083) |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | OTel Collector gRPC endpoint (e.g. `otel-collector:4317`). Omit to disable tracing. |
+| `OTEL_SERVICE_NAME` | Service name reported in traces (defaults to the service binary name) |
 
 ### frontend
 | Variable | Description |
@@ -114,4 +116,4 @@ npm run dev
 | `AUTH_URL` | Auth service URL (default: `http://localhost:8081`) |
 | `LONGTERM_URL` | Longterm service URL (default: `http://localhost:8082`) |
 | `DAILY_URL` | Daily service URL (default: `http://localhost:8083`) |
-# OpenTelemetry instrumentation added
+| `NEXT_PUBLIC_OTEL_EXPORTER_OTLP_ENDPOINT` | OTel Collector HTTP endpoint for browser traces (e.g. `http://otel-collector:4318`). Omit to disable tracing. |
