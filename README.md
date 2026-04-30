@@ -114,3 +114,4 @@ npm run dev
 | `AUTH_URL` | Auth service URL (default: `http://localhost:8081`) |
 | `LONGTERM_URL` | Longterm service URL (default: `http://localhost:8082`) |
 | `DAILY_URL` | Daily service URL (default: `http://localhost:8083`) |
+# OpenTelemetry instrumentation added
