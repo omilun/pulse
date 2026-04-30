@@ -24,7 +24,7 @@ func New(dsn string) (*Store, error) {
 	if err := db.Ping(); err != nil {
 		return nil, err
 	}
-	if _, err := otelsql.RegisterDBStatsMetrics(db, otelsql.WithAttributes(semconv.DBSystemPostgreSQL)); err != nil {
+	if err := otelsql.RegisterDBStatsMetrics(db, otelsql.WithAttributes(semconv.DBSystemPostgreSQL)); err != nil {
 		return nil, err
 	}
 	return &Store{db: db}, nil
